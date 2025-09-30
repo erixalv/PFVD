@@ -1,4 +1,3 @@
-# app_dash_enem.py
 import json, os
 import pandas as pd
 import numpy as np
@@ -23,7 +22,6 @@ def ensure_columns(df):
     if present: df["nota_media"] = df[present].mean(axis=1)
     return df
 
-# --- Dados
 df = pd.read_csv("./DADOS/resultados.csv", sep=";", encoding="latin1")
 df = ensure_columns(df)
 
@@ -42,16 +40,13 @@ def agg_series(s, how):
     if how=="p10": return s.quantile(0.10)
     return s.mean()
 
-# --- App
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 app.title = "ENEM — Dash Drill-Down"
 
-# --- Layout
 app.layout = dbc.Container([
     dbc.Row([
         dbc.Col(html.H2("ENEM — Mapa interativo (Dash)", className="text-center mb-4"), width=12)
     ]),
-    # Painel de filtros
     dbc.Card([
         dbc.CardBody([
             dbc.Row([
@@ -75,7 +70,6 @@ app.layout = dbc.Container([
             ])
         ])
     ], className="mb-4"),
-    # Mapas e tabelas
     dbc.Row([
         dbc.Col(dbc.Card(dbc.CardBody(dcc.Graph(id="map_estados"))), md=12, className="mb-4")
     ]),
@@ -99,7 +93,6 @@ app.layout = dbc.Container([
     ])
 ], fluid=True)
 
-# --- Callbacks
 @app.callback(
     Output("map_estados","figure"),
     Output("tbl_estados","figure"),
@@ -129,7 +122,7 @@ def render_estados(metric, agg_fun, sel_ufs):
     )
     fig_est.update_geos(fitbounds="geojson", visible=False)
     fig_est.update_layout(margin=dict(l=0,r=0,t=0,b=0), template="plotly_white")
-    # Tabela por estado
+
     tbl = agg_estado.sort_values("media_estado", ascending=False)
     fig_tbl = px.scatter(
         tbl, x="Estado", y="media_estado", size="qtde",
@@ -200,7 +193,7 @@ def render_munis(clickData, metric, agg_fun, min_n, sel_ufs):
             "name_muni": True,
             "qtde": ":,.0f",
             "media_muni":":.2f",
-            "code_muni": False   # esconde o código
+            "code_muni": False   
         },
         labels={"media_muni":f"Média — {metric}","qtde":"Registros"}
         )
